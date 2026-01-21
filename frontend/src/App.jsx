@@ -9,11 +9,39 @@ import Navbar from './components/Navbar'
 import ForgotPassword from './pages/ForgotPassword'
 import VerifyOTP from './pages/VerifyOTP'
 import ChangePassword from './pages/ChangePassword'
+import Dashboard from './pages/Dashboard'
+import HealthMetricsForm from './pages/HealthMetricsForm'
+import Medications from './pages/Medications'
+import MedicationForm from './pages/MedicationForm'
 
 const router=createBrowserRouter([
   {
     path:'/',
-    element:<ProtectedRoute><Navbar/></ProtectedRoute>
+    element:<ProtectedRoute><Navbar/><Dashboard/></ProtectedRoute>
+  },
+  {
+    path:'/dashboard',
+    element:<ProtectedRoute><Navbar/><Dashboard/></ProtectedRoute>
+  },
+  {
+    path:'/health-metrics/add',
+    element:<ProtectedRoute><Navbar/><HealthMetricsForm/></ProtectedRoute>
+  },
+  {
+    path:'/health-metrics/edit/:id',
+    element:<ProtectedRoute><Navbar/><HealthMetricsForm/></ProtectedRoute>
+  },
+  {
+    path:'/medications',
+    element:<ProtectedRoute><Navbar/><Medications/></ProtectedRoute>
+  },
+  {
+    path:'/medications/add',
+    element:<ProtectedRoute><Navbar/><MedicationForm/></ProtectedRoute>
+  },
+  {
+    path:'/medications/edit/:id',
+    element:<ProtectedRoute><Navbar/><MedicationForm/></ProtectedRoute>
   },
   {
     path:'/signup',
@@ -46,7 +74,7 @@ const router=createBrowserRouter([
 ])
 const App = () => {
   return (
-    <div className='text-red-700'>
+    <div>
       <RouterProvider router={router}/>
     </div>
   )

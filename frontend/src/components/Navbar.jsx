@@ -1,6 +1,7 @@
-import { BookA, BookOpen, LogOut, Stethoscope, User } from 'lucide-react'
+import { LogOut, User, Stethoscope, LayoutDashboard, Pill } from 'lucide-react'
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,12 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { getData } from '@/context/userContext'
 import axios from 'axios'
 import { toast } from 'sonner'
-import { ClipboardPlus } from 'lucide-react'
 
 const Navbar = () => {
     const {user, setUser} = getData()
     const accessToken = localStorage.getItem("accessToken")
-    console.log(user);
+    const location = useLocation()
 
     const logoutHandler = async()=>{
         try {
@@ -34,41 +34,154 @@ const Navbar = () => {
             }
         } catch (error) {
             console.log(error);
-            
         }
     }
+
+    const isActive = (path) => location.pathname === path
     
     return (
-        <nav className='p-2 border-b border-gray-200 bg-transparent'>
-            <div className='max-w-7xl mx-auto flex justify-between items-center'>
-                {/* logo section  */}
-                <div className='flex gap-2 items-center'>
-                    <ClipboardPlus size={44} color="#84e686" strokeWidth={2.75} absoluteStrokeWidth />
-                    <h1 className='font-bold text-xl'><span className='text-green-600'>Care</span>Nexa</h1>
-                </div>
-                <div className='flex gap-7 items-center'>
-                    <ul className='flex gap-7 items-center text-lg font-semibold'>
-                        <li>Features</li>
-                        <li>Pricing</li>
-                        <li>About</li>
-                        {
-                            user ? <DropdownMenu>
-                                <DropdownMenuTrigger>
-                                    <Avatar>
-                                        <AvatarImage src={user?.avatar} />
-                                        <AvatarFallback>CN</AvatarFallback>
-                                    </Avatar>
+        <nav className='sticky top-0 z-50 backdrop-blur-md bg-white/80 border-b-2 border-[#eae0d5]/50 shadow-sm'>
+            <div className='max-w-7xl mx-auto px-4 md:px-6 py-3 flex justify-between items-center'>
+                {/* Logo section */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className='flex gap-2 items-center'
+                >
+                    <Link to={user ? '/dashboard' : '/'} className="flex items-center gap-2 group">
+                        <motion.div
+                            whileHover={{ rotate: 360, scale: 1.1 }}
+                            transition={{ duration: 0.5 }}
+                        >
+                            <Stethoscope size={40} className="text-[#00b4d8]" strokeWidth={2.5} />
+                        </motion.div>
+                        <h1 className='font-bold text-2xl bg-gradient-to-r from-[#00b4d8] to-[#bbd0ff] bg-clip-text text-transparent group-hover:from-[#0099c4] group-hover:to-[#a8c0ff] transition-all'>
+                            CareNexa
+                        </h1>
+                    </Link>
+                </motion.div>
+
+                <div className='flex gap-6 items-center'>
+                    {user ? (
+                        <>
+                            {/* Navigation Links */}
+                            <ul className='hidden md:flex gap-6 items-center'>
+                                <motion.li whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
+                                    <Link
+                                        to={'/dashboard'}
+                                        className={`relative px-4 py-2 rounded-lg font-semibold transition-all ${
+                                            isActive('/dashboard') || isActive('/')
+                                                ? 'text-[#00b4d8] bg-[#caf0f8]/50'
+                                                : 'text-gray-700 hover:text-[#00b4d8] hover:bg-[#caf0f8]/30'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <LayoutDashboard className="w-4 h-4" />
+                                            Dashboard
+                                        </div>
+                                        {(isActive('/dashboard') || isActive('/')) && (
+                                            <motion.div
+                                                layoutId="activeTab"
+                                                className="absolute inset-0 bg-[#caf0f8]/50 rounded-lg -z-10"
+                                                initial={false}
+                                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                            />
+                                        )}
+                                    </Link>
+                                </motion.li>
+                                <motion.li whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
+                                    <Link
+                                        to={'/medications'}
+                                        className={`relative px-4 py-2 rounded-lg font-semibold transition-all ${
+                                            isActive('/medications')
+                                                ? 'text-[#bbd0ff] bg-[#bbd0ff]/20'
+                                                : 'text-gray-700 hover:text-[#bbd0ff] hover:bg-[#bbd0ff]/10'
+                                        }`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <Pill className="w-4 h-4" />
+                                            Medications
+                                        </div>
+                                        {isActive('/medications') && (
+                                            <motion.div
+                                                layoutId="activeTab"
+                                                className="absolute inset-0 bg-[#bbd0ff]/20 rounded-lg -z-10"
+                                                initial={false}
+                                                transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                                            />
+                                        )}
+                                    </Link>
+                                </motion.li>
+                            </ul>
+
+                            {/* User Avatar Dropdown */}
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        className="focus:outline-none"
+                                    >
+                                        <Avatar className="border-2 border-[#00b4d8]/30 hover:border-[#00b4d8] transition-all cursor-pointer ring-2 ring-offset-2 ring-offset-white ring-[#caf0f8]">
+                                            <AvatarImage src={user?.avatar} />
+                                            <AvatarFallback className="bg-gradient-to-br from-[#00b4d8] to-[#bbd0ff] text-white font-semibold">
+                                                {user?.username?.charAt(0).toUpperCase() || 'U'}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                    </motion.button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem><User/>Profile</DropdownMenuItem>
-                                   <DropdownMenuSeparator />
-                                    <DropdownMenuItem onClick={logoutHandler} ><LogOut/>Logout</DropdownMenuItem>
+                                <DropdownMenuContent
+                                    align="end"
+                                    className="w-56 bg-white/95 backdrop-blur-sm border-2 border-[#eae0d5] shadow-xl"
+                                >
+                                    <DropdownMenuLabel className="font-semibold text-gray-800">
+                                        My Account
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator className="bg-[#eae0d5]" />
+                                    <DropdownMenuItem className="cursor-pointer hover:bg-[#caf0f8]/50 focus:bg-[#caf0f8]/50">
+                                        <User className="w-4 h-4 mr-2 text-[#00b4d8]" />
+                                        <span>Profile</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-[#eae0d5]" />
+                                    <DropdownMenuItem
+                                        onClick={logoutHandler}
+                                        className="cursor-pointer hover:bg-red-50 focus:bg-red-50 text-red-600"
+                                    >
+                                        <LogOut className="w-4 h-4 mr-2" />
+                                        <span>Logout</span>
+                                    </DropdownMenuItem>
                                 </DropdownMenuContent>
-                            </DropdownMenu> : <Link to={'/login'}><li>Login</li></Link>
-                        }
-                    </ul>
+                            </DropdownMenu>
+                        </>
+                    ) : (
+                        <>
+                            {/* Public Navigation */}
+                            <ul className='hidden md:flex gap-6 items-center text-lg font-semibold'>
+                                <motion.li whileHover={{ y: -2 }}>
+                                    <Link to={'/features'} className='text-gray-700 hover:text-[#00b4d8] transition-colors'>
+                                        Features
+                                    </Link>
+                                </motion.li>
+                                <motion.li whileHover={{ y: -2 }}>
+                                    <Link to={'/pricing'} className='text-gray-700 hover:text-[#00b4d8] transition-colors'>
+                                        Pricing
+                                    </Link>
+                                </motion.li>
+                                <motion.li whileHover={{ y: -2 }}>
+                                    <Link to={'/about'} className='text-gray-700 hover:text-[#00b4d8] transition-colors'>
+                                        About
+                                    </Link>
+                                </motion.li>
+                            </ul>
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Link to={'/login'}>
+                                    <button className='px-6 py-2 bg-gradient-to-r from-[#00b4d8] to-[#bbd0ff] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all'>
+                                        Login
+                                    </button>
+                                </Link>
+                            </motion.div>
+                        </>
+                    )}
                 </div>
             </div>
         </nav>
