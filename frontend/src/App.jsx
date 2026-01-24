@@ -13,6 +13,19 @@ import Dashboard from './pages/Dashboard'
 import HealthMetricsForm from './pages/HealthMetricsForm'
 import Medications from './pages/Medications'
 import MedicationForm from './pages/MedicationForm'
+// Helper Booking System Pages
+import HelperRegister from './pages/HelperRegister'
+import HelperLogin from './pages/HelperLogin'
+import HelperPayment from './pages/HelperPayment'
+import HelperDashboard from './pages/HelperDashboard'
+import PatientRegister from './pages/PatientRegister'
+import PatientLogin from './pages/PatientLogin'
+import PatientDashboard from './pages/PatientDashboard'
+import BrowseHelpers from './pages/BrowseHelpers'
+import CreateBooking from './pages/CreateBooking'
+import AdminDashboard from './pages/AdminDashboard'
+import HelperBookingHome from './pages/HelperBookingHome'
+import PatientVerifyEmail from './pages/PatientVerifyEmail'
 
 const router=createBrowserRouter([
   {
@@ -70,6 +83,59 @@ const router=createBrowserRouter([
   {
     path:'/change-password/:email',
     element:<ChangePassword/>
+  },
+  // Helper Booking System Routes
+  {
+    path:'/helper/register',
+    element:<HelperRegister/>
+  },
+  {
+    path:'/helper/login',
+    element:<HelperLogin/>
+  },
+  {
+    path:'/helper/payment',
+    element:<HelperPayment/>
+  },
+  {
+    path:'/helper/dashboard',
+    element:<ProtectedRoute userType="helper"><HelperDashboard/></ProtectedRoute>
+  },
+  {
+    path:'/patient/register',
+    element:<PatientRegister/>
+  },
+  {
+    path:'/patient/login',
+    element:<PatientLogin/>
+  },
+  {
+    path:'/patient/verify/:token',
+    element:<PatientVerifyEmail/>
+  },
+  {
+    path:'/patient/dashboard',
+    element:<ProtectedRoute userType="patient"><PatientDashboard/></ProtectedRoute>
+  },
+  {
+    path:'/booking/helpers',
+    element:<BrowseHelpers/>
+  },
+  {
+    path:'/booking/helper/:helperId',
+    element:<ProtectedRoute userType="patient"><CreateBooking/></ProtectedRoute>
+  },
+  {
+    path:'/patient/bookings',
+    element:<ProtectedRoute userType="patient"><PatientDashboard/></ProtectedRoute>
+  },
+  {
+    path:'/admin/dashboard',
+    element:<ProtectedRoute userType="admin"><AdminDashboard/></ProtectedRoute>
+  },
+  {
+    path:'/helper-booking',
+    element:<HelperBookingHome/>
   }
 ])
 const App = () => {

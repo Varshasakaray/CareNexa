@@ -35,6 +35,12 @@ const Login = () => {
         }))
     }
 
+    // Admin email whitelist
+    const ADMIN_EMAILS = [
+        'shashirekhasakaray@gmail.com',
+        'sakaray.20233241@mnnit.ac.in'
+    ];
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         console.log(formData);
@@ -46,14 +52,29 @@ const Login = () => {
                 }
             })
             if (res.data.success) {
-                navigate('/')
+                const isAdmin = ADMIN_EMAILS.includes(formData.email.toLowerCase());
+                
                 setUser(res.data.user)
                 localStorage.setItem("accessToken", res.data.accessToken)
-                toast.success(res.data.message)
+                localStorage.setItem("refreshToken", res.data.refreshToken)
+                
+                if (isAdmin) {
+                    localStorage.setItem("userType", "admin")
+                    toast.success(res.data.message)
+                    navigate('/admin/dashboard')
+                } else {
+                    localStorage.setItem("userType", "user")
+                    toast.success(res.data.message)
+                    navigate('/')
+                }
             }
         } catch (error) {
             console.log(error);
-
+            if (error.response?.data?.message) {
+                toast.error(error.response.data.message)
+            } else {
+                toast.error('Login failed')
+            }
         } finally {
             setIsLoading(false)
         }

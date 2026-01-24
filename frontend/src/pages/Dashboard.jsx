@@ -17,7 +17,7 @@ import {
 import { format } from "date-fns";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Activity, Heart, Scale, Droplets, Plus, TrendingUp, Calendar } from "lucide-react";
+import { Activity, Heart, Scale, Droplets, Plus, TrendingUp, Calendar, Users, UserPlus, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
@@ -416,6 +416,143 @@ const Dashboard = () => {
                   Add medications and set up reminders
                 </CardDescription>
               </CardHeader>
+            </Card>
+          </motion.div>
+        </motion.div>
+
+        {/* Helper Booking System Section */}
+        <motion.div
+          variants={itemVariants}
+          className="mt-8"
+        >
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-[#ff6b6b] to-[#ff8787] bg-clip-text text-transparent">
+              🩺 Helper Booking System
+            </h2>
+            <p className="text-gray-600 mt-2">Book verified helpers for hospital visits and medical assistance</p>
+          </div>
+          
+          <motion.div
+            variants={containerVariants}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+          >
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ scale: 1.02, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Card
+                className="cursor-pointer bg-gradient-to-br from-[#ff6b6b]/10 to-[#ff8787]/10 border-2 border-[#ff6b6b]/30 shadow-lg hover:shadow-2xl transition-all duration-300"
+                onClick={() => navigate("/helper-booking")}
+              >
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <Users className="w-6 h-6 text-[#ff6b6b]" />
+                    Helper Booking
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Access the helper booking system - register as patient or helper
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ scale: 1.02, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Card
+                className="cursor-pointer bg-gradient-to-br from-[#4ecdc4]/10 to-[#44a08d]/10 border-2 border-[#4ecdc4]/30 shadow-lg hover:shadow-2xl transition-all duration-300"
+                onClick={() => navigate("/booking/helpers")}
+              >
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <Calendar className="w-6 h-6 text-[#4ecdc4]" />
+                    Browse Helpers
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Find and book verified helpers in your area by pincode
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              variants={itemVariants}
+              whileHover={{ scale: 1.02, y: -5 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Card
+                className="cursor-pointer bg-gradient-to-br from-[#95a5a6]/10 to-[#7f8c8d]/10 border-2 border-[#95a5a6]/30 shadow-lg hover:shadow-2xl transition-all duration-300"
+                onClick={() => {
+                  const userType = localStorage.getItem('userType');
+                  if (userType === 'admin') {
+                    navigate("/admin/dashboard");
+                  } else {
+                    navigate("/helper-booking");
+                  }
+                }}
+              >
+                <CardHeader>
+                  <CardTitle className="text-xl font-bold text-gray-800 flex items-center gap-2">
+                    <Shield className="w-6 h-6 text-[#95a5a6]" />
+                    Admin Dashboard
+                  </CardTitle>
+                  <CardDescription className="text-gray-600">
+                    Manage helpers, bookings, and system settings (Admin only)
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </motion.div>
+          </motion.div>
+
+          {/* Quick Links */}
+          <motion.div
+            variants={itemVariants}
+            className="mt-6"
+          >
+            <Card className="bg-white/80 backdrop-blur-sm shadow-xl border-2 border-[#ff6b6b]/20">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-gray-800">Quick Links</CardTitle>
+                <CardDescription className="text-gray-600">Quick access to helper booking features</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => navigate("/patient/register")}
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Register as Patient
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => navigate("/patient/login")}
+                  >
+                    <UserPlus className="w-4 h-4" />
+                    Patient Login
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => navigate("/helper/register")}
+                  >
+                    <Users className="w-4 h-4" />
+                    Register as Helper
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2"
+                    onClick={() => navigate("/helper/login")}
+                  >
+                    <Users className="w-4 h-4" />
+                    Helper Login
+                  </Button>
+                </div>
+              </CardContent>
             </Card>
           </motion.div>
         </motion.div>

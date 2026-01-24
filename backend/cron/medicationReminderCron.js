@@ -1,4 +1,5 @@
 import cron from "node-cron";
+import mongoose from "mongoose";
 import { Medication } from "../models/medicationModel.js";
 import { sendMedicationReminder } from "../emailVerify/medicationReminder.js";
 
@@ -14,6 +15,11 @@ const normalizeTime = (timeStr) => {
 export const startMedicationReminderCron = () => {
     cron.schedule("* * * * *", async () => {
         try {
+            // Check if database is connected
+            if (mongoose.connection.readyState !== 1) {
+                return; // Skip if DB not connected
+            }
+
             const now = new Date();
             const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             const currentDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
