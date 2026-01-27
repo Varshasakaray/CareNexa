@@ -64,17 +64,25 @@ const BrowseHelpers = () => {
             <div className="flex flex-col items-center text-center">
               {helper.profilePhoto ? (
                 <img
-                  src={`http://localhost:8000/${helper.profilePhoto}`}
+                  src={`http://localhost:8000/uploads/${helper.profilePhoto.split(/[\\/]/).pop()}`}
                   alt={helper.fullName}
                   className="w-24 h-24 rounded-full object-cover mb-4 border-4 border-blue-200"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
                 />
-              ) : (
-                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mb-4 border-4 border-blue-200">
-                  <span className="text-2xl font-bold text-gray-500">
-                    {helper.fullName?.charAt(0).toUpperCase() || 'H'}
-                  </span>
-                </div>
-              )}
+              ) : null}
+              
+              <div 
+                className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mb-4 border-4 border-blue-200"
+                style={{ display: helper.profilePhoto ? 'none' : 'flex' }}
+              >
+                <span className="text-2xl font-bold text-gray-500">
+                  {helper.fullName?.charAt(0).toUpperCase() || 'H'}
+                </span>
+              </div>
+
               <h3 className="font-semibold text-lg mb-2">{helper.fullName}</h3>
               <div className="flex gap-2 justify-center mb-2">
                 <Badge>⭐ {helper.averageRating || 'N/A'}</Badge>

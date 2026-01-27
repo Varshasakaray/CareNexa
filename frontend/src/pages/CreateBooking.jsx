@@ -103,17 +103,24 @@ const CreateBooking = () => {
         <div className="flex items-center gap-4">
           {helper.profilePhoto ? (
             <img
-              src={`http://localhost:8000/${helper.profilePhoto}`}
+              src={`http://localhost:8000/uploads/${helper.profilePhoto.split(/[\\/]/).pop()}`}
               alt={helper.fullName}
               className="w-20 h-20 rounded-full object-cover border-4 border-blue-200"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
             />
-          ) : (
-            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center border-4 border-blue-200">
-              <span className="text-2xl font-bold text-gray-500">
-                {helper.fullName?.charAt(0).toUpperCase() || 'H'}
-              </span>
-            </div>
-          )}
+          ) : null}
+          
+          <div 
+            className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center border-4 border-blue-200"
+            style={{ display: helper.profilePhoto ? 'none' : 'flex' }}
+          >
+            <span className="text-2xl font-bold text-gray-500">
+              {helper.fullName?.charAt(0).toUpperCase() || 'H'}
+            </span>
+          </div>
           <div>
             <p className="font-semibold text-lg">{helper.fullName}</p>
             <p className="text-sm text-gray-600">Rating: {helper.averageRating || 'N/A'}/5</p>

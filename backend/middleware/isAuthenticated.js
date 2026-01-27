@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { User } from '../models/userModel.js';
+import { Patient } from '../models/patientModel.js';
 
 export const isAuthenticated = async(req, res, next) =>{
     try {
@@ -29,11 +30,17 @@ export const isAuthenticated = async(req, res, next) =>{
             }
             const {id} = decoded;
 
-            const user = await User.findById(id)
+            let user = await User.findById(id);
+            
+            // If not found in User collection, check Patient collection
+            if (!user) {
+                user = await Patient.findById(id);
+            }
+
             if(!user){
                 return res.status(404).json({
                     success:false,
-                    message:"user not found"
+                    message:"User not found"
                 })
             }
             

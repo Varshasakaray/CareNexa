@@ -123,7 +123,7 @@ const router=createBrowserRouter([
   },
   {
     path:'/booking/helper/:helperId',
-    element:<ProtectedRoute userType="patient"><CreateBooking/></ProtectedRoute>
+    element:<ProtectedRoute><CreateBooking/></ProtectedRoute>
   },
   {
     path:'/patient/bookings',

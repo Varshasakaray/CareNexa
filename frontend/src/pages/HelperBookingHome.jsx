@@ -1,10 +1,12 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import Navbar from '../components/Navbar';
+import { getData } from '../context/userContext';
 
 const HelperBookingHome = () => {
   const navigate = useNavigate();
+  const { user } = getData();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -19,7 +21,7 @@ const HelperBookingHome = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           <Card className="p-6 text-center hover:shadow-lg transition-shadow">
             <div className="text-4xl mb-4">👤</div>
             <h2 className="text-2xl font-semibold mb-2">I'm a Patient</h2>
@@ -72,30 +74,15 @@ const HelperBookingHome = () => {
               </Button>
             </div>
           </Card>
-
-          <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-            <div className="text-4xl mb-4">⚙️</div>
-            <h2 className="text-2xl font-semibold mb-2">Admin</h2>
-            <p className="text-gray-600 mb-4">
-              Manage helpers, bookings, and system settings.
-            </p>
-            <div className="space-y-2">
-              <Button 
-                className="w-full" 
-                onClick={() => navigate('/login')}
-              >
-                Admin Login
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => navigate('/admin/dashboard')}
-              >
-                Admin Dashboard
-              </Button>
-            </div>
-          </Card>
         </div>
+        
+        {!user && (
+          <div className="mt-12 text-center">
+             <Link to="/login" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
+               Admin Login
+             </Link>
+          </div>
+        )}
 
         <div className="mt-12 max-w-3xl mx-auto">
           <Card className="p-6">

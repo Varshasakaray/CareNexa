@@ -62,8 +62,13 @@ export const registerHelper = async (req, res) => {
         }
 
         // File uploads
-        const profilePhoto = req.files?.profilePhoto?.[0]?.path || null;
-        const governmentIdProof = req.files?.governmentIdProof?.[0]?.path || null;
+        // Store relative path (e.g., uploads/filename.jpg) instead of absolute path
+        const profilePhoto = req.files?.profilePhoto?.[0]?.filename 
+            ? `uploads/${req.files.profilePhoto[0].filename}` 
+            : null;
+        const governmentIdProof = req.files?.governmentIdProof?.[0]?.filename 
+            ? `uploads/${req.files.governmentIdProof[0].filename}` 
+            : null;
 
         // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);

@@ -1,5 +1,5 @@
 import express from "express";
-import { isAuthenticatedPatient } from "../middleware/isAuthenticatedPatient.js";
+import { isAuthenticated } from "../middleware/isAuthenticated.js";
 import { isAuthenticatedHelper } from "../middleware/isAuthenticatedHelper.js";
 import {
     browseHelpers,
@@ -23,11 +23,11 @@ router.get('/helpers', browseHelpers);
 router.get('/helpers/:helperId', getHelperDetails);
 router.post('/calculate-price', calculatePrice);
 
-// Protected routes (Patient only)
-router.post('/create', isAuthenticatedPatient, createBooking);
-router.post('/:bookingId/cancel', isAuthenticatedPatient, cancelBooking);
-router.post('/:bookingId/rate', isAuthenticatedPatient, rateHelper);
-router.get('/history', isAuthenticatedPatient, getBookingHistory);
+// Protected routes (Authenticated Users & Patients)
+router.post('/create', isAuthenticated, createBooking);
+router.post('/:bookingId/cancel', isAuthenticated, cancelBooking);
+router.post('/:bookingId/rate', isAuthenticated, rateHelper);
+router.get('/history', isAuthenticated, getBookingHistory);
 
 // Protected routes (Helper only)
 router.post('/:bookingId/accept', isAuthenticatedHelper, acceptBooking);
