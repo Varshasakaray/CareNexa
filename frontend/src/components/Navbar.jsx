@@ -333,28 +333,34 @@ const Navbar = () => {
                 </motion.li>
                 <motion.li whileHover={{ y: -2 }}>
                   <Link
-                    to={"/pricing"}
-                    className="text-gray-700 hover:text-[#00b4d8] transition-colors"
-                  >
-                    Pricing
-                  </Link>
-                </motion.li>
-                <motion.li whileHover={{ y: -2 }}>
-                  <Link
                     to={"/about"}
                     className="text-gray-700 hover:text-[#00b4d8] transition-colors"
                   >
                     About
                   </Link>
                 </motion.li>
+                <motion.li whileHover={{ y: -2 }}>
+                  <a
+                    href="mailto:support@carenexa.com"
+                    className="text-gray-700 hover:text-[#00b4d8] transition-colors"
+                  >
+                    Contact Us
+                  </a>
+                </motion.li>
               </ul>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                className="flex gap-4"
               >
                 <Link to={"/login"}>
                   <button className="px-6 py-2 bg-gradient-to-r from-[#00b4d8] to-[#bbd0ff] text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all">
                     Login
+                  </button>
+                </Link>
+                <Link to={"/signup"}>
+                  <button className="px-6 py-2 border-2 border-[#00b4d8] text-[#00b4d8] font-semibold rounded-lg hover:bg-[#00b4d8] hover:text-white transition-all">
+                    Signup
                   </button>
                 </Link>
               </motion.div>

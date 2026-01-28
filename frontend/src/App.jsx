@@ -1,149 +1,210 @@
-import React from 'react'
-import { createBrowserRouter,RouterProvider } from 'react-router-dom'
-import Signup from './pages/Signup'
-import Login from './pages/Login'
-import VerifyEmail from './pages/VerifyEmail'
-import Verify from './pages/Verify'
-import ProtectedRoute from './components/ProtectedRoute'
-import Navbar from './components/Navbar'
-import ForgotPassword from './pages/ForgotPassword'
-import VerifyOTP from './pages/VerifyOTP'
-import ChangePassword from './pages/ChangePassword'
-import Dashboard from './pages/Dashboard'
-import HealthMetricsForm from './pages/HealthMetricsForm'
-import Medications from './pages/Medications'
-import MedicationForm from './pages/MedicationForm'
+import React from "react";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import VerifyEmail from "./pages/VerifyEmail";
+import Verify from "./pages/Verify";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
+import ForgotPassword from "./pages/ForgotPassword";
+import VerifyOTP from "./pages/VerifyOTP";
+import ChangePassword from "./pages/ChangePassword";
+import Dashboard from "./pages/Dashboard";
+import HealthMetricsForm from "./pages/HealthMetricsForm";
+import Medications from "./pages/Medications";
+import MedicationForm from "./pages/MedicationForm";
 // Helper Booking System Pages
-import HelperRegister from './pages/HelperRegister'
-import HelperLogin from './pages/HelperLogin'
-import HelperPayment from './pages/HelperPayment'
-import HelperDashboard from './pages/HelperDashboard'
-import PatientRegister from './pages/PatientRegister'
-import PatientLogin from './pages/PatientLogin'
-import PatientDashboard from './pages/PatientDashboard'
-import BrowseHelpers from './pages/BrowseHelpers'
-import CreateBooking from './pages/CreateBooking'
-import AdminDashboard from './pages/AdminDashboard'
-import HelperBookingHome from './pages/HelperBookingHome'
-import PatientVerifyEmail from './pages/PatientVerifyEmail'
+import HelperRegister from "./pages/HelperRegister";
+import HelperLogin from "./pages/HelperLogin";
+import HelperPayment from "./pages/HelperPayment";
+import HelperDashboard from "./pages/HelperDashboard";
+import PatientRegister from "./pages/PatientRegister";
+import PatientLogin from "./pages/PatientLogin";
+import PatientDashboard from "./pages/PatientDashboard";
+import BrowseHelpers from "./pages/BrowseHelpers";
+import CreateBooking from "./pages/CreateBooking";
+import AdminDashboard from "./pages/AdminDashboard";
+import HelperBookingHome from "./pages/HelperBookingHome";
+import PatientVerifyEmail from "./pages/PatientVerifyEmail";
+import Home from "./pages/Home";
+import Features from "./pages/Features";
+import About from "./pages/About";
 
-const router=createBrowserRouter([
+const router = createBrowserRouter([
   {
-    path:'/',
-    element:<ProtectedRoute><Navbar/><Dashboard/></ProtectedRoute>
+    path: "/",
+    element: <Home />,
   },
   {
-    path:'/dashboard',
-    element:<ProtectedRoute><Navbar/><Dashboard/></ProtectedRoute>
+    path: "/features",
+    element: <Features />,
   },
   {
-    path:'/health-metrics/add',
-    element:<ProtectedRoute><Navbar/><HealthMetricsForm/></ProtectedRoute>
+    path: "/about",
+    element: <About />,
   },
   {
-    path:'/health-metrics/edit/:id',
-    element:<ProtectedRoute><Navbar/><HealthMetricsForm/></ProtectedRoute>
+    path: "/dashboard",
+    element: (
+      <ProtectedRoute>
+        <Navbar />
+        <Dashboard />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/medications',
-    element:<ProtectedRoute><Navbar/><Medications/></ProtectedRoute>
+    path: "/health-metrics/add",
+    element: (
+      <ProtectedRoute>
+        <Navbar />
+        <HealthMetricsForm />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/medications/add',
-    element:<ProtectedRoute><Navbar/><MedicationForm/></ProtectedRoute>
+    path: "/health-metrics/edit/:id",
+    element: (
+      <ProtectedRoute>
+        <Navbar />
+        <HealthMetricsForm />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/medications/edit/:id',
-    element:<ProtectedRoute><Navbar/><MedicationForm/></ProtectedRoute>
+    path: "/medications",
+    element: (
+      <ProtectedRoute>
+        <Navbar />
+        <Medications />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/signup',
-    element:<Signup/>
+    path: "/medications/add",
+    element: (
+      <ProtectedRoute>
+        <Navbar />
+        <MedicationForm />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/login',
-    element:<Login/>
+    path: "/medications/edit/:id",
+    element: (
+      <ProtectedRoute>
+        <Navbar />
+        <MedicationForm />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/verify',
-    element:<VerifyEmail/>
+    path: "/signup",
+    element: <Signup />,
   },
   {
-    path:'/verify/:token',
-    element:<Verify/>
+    path: "/login",
+    element: <Login />,
   },
   {
-    path:'/forgot-password',
-    element:<ForgotPassword/>
+    path: "/verify",
+    element: <VerifyEmail />,
   },
   {
-    path:'/verify-otp/:email',
-    element:<VerifyOTP/>
+    path: "/verify/:token",
+    element: <Verify />,
   },
   {
-    path:'/change-password/:email',
-    element:<ChangePassword/>
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/verify-otp/:email",
+    element: <VerifyOTP />,
+  },
+  {
+    path: "/change-password/:email",
+    element: <ChangePassword />,
   },
   // Helper Booking System Routes
   {
-    path:'/helper/register',
-    element:<HelperRegister/>
+    path: "/helper/register",
+    element: <HelperRegister />,
   },
   {
-    path:'/helper/login',
-    element:<HelperLogin/>
+    path: "/helper/login",
+    element: <HelperLogin />,
   },
   {
-    path:'/helper/payment',
-    element:<HelperPayment/>
+    path: "/helper/payment",
+    element: <HelperPayment />,
   },
   {
-    path:'/helper/dashboard',
-    element:<ProtectedRoute userType="helper"><HelperDashboard/></ProtectedRoute>
+    path: "/helper/dashboard",
+    element: (
+      <ProtectedRoute userType="helper">
+        <HelperDashboard />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/patient/register',
-    element:<PatientRegister/>
+    path: "/patient/register",
+    element: <PatientRegister />,
   },
   {
-    path:'/patient/login',
-    element:<PatientLogin/>
+    path: "/patient/login",
+    element: <PatientLogin />,
   },
   {
-    path:'/patient/verify/:token',
-    element:<PatientVerifyEmail/>
+    path: "/patient/verify/:token",
+    element: <PatientVerifyEmail />,
   },
   {
-    path:'/patient/dashboard',
-    element:<ProtectedRoute userType="patient"><PatientDashboard/></ProtectedRoute>
+    path: "/patient/dashboard",
+    element: (
+      <ProtectedRoute userType="patient">
+        <PatientDashboard />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/booking/helpers',
-    element:<BrowseHelpers/>
+    path: "/booking/helpers",
+    element: <BrowseHelpers />,
   },
   {
-    path:'/booking/helper/:helperId',
-    element:<ProtectedRoute><CreateBooking/></ProtectedRoute>
+    path: "/booking/helper/:helperId",
+    element: (
+      <ProtectedRoute>
+        <CreateBooking />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/patient/bookings',
-    element:<ProtectedRoute userType="patient"><PatientDashboard/></ProtectedRoute>
+    path: "/patient/bookings",
+    element: (
+      <ProtectedRoute userType="patient">
+        <PatientDashboard />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/admin/dashboard',
-    element:<ProtectedRoute userType="admin"><AdminDashboard/></ProtectedRoute>
+    path: "/admin/dashboard",
+    element: (
+      <ProtectedRoute userType="admin">
+        <AdminDashboard />
+      </ProtectedRoute>
+    ),
   },
   {
-    path:'/helper-booking',
-    element:<HelperBookingHome/>
-  }
-])
+    path: "/helper-booking",
+    element: <HelperBookingHome />,
+  },
+]);
 const App = () => {
   return (
     <div>
-      <RouterProvider router={router}/>
+      <RouterProvider router={router} />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
