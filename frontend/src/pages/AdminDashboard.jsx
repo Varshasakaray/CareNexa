@@ -136,6 +136,34 @@ const AdminDashboard = () => {
                         <p className="text-sm text-gray-600">Aadhaar: XXXX XXXX {helper.aadhaarLast4}</p>
                         <p className="text-sm text-gray-600">Age: {helper.age}</p>
                         <p className="text-sm text-gray-600">Pincode: {helper.pincode}</p>
+                        <div className="mt-2 flex gap-4">
+                          {helper.profilePhoto && (
+                            <div>
+                              <p className="text-xs font-semibold mb-1">Profile Photo</p>
+                              <img
+                                src={`http://localhost:8000/${helper.profilePhoto}`}
+                                alt="Profile"
+                                className="w-24 h-24 object-cover rounded-md border"
+                              />
+                            </div>
+                          )}
+                          {helper.governmentIdProof && (
+                            <div>
+                              <p className="text-xs font-semibold mb-1">Govt ID</p>
+                              <a 
+                                href={`http://localhost:8000/${helper.governmentIdProof}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                              >
+                                <img
+                                  src={`http://localhost:8000/${helper.governmentIdProof}`}
+                                  alt="Government ID"
+                                  className="w-32 h-24 object-cover rounded-md border hover:opacity-80 transition-opacity"
+                                />
+                              </a>
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" onClick={() => handleApprove(helper._id)}>

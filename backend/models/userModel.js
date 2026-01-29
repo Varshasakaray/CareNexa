@@ -8,7 +8,9 @@ const userSchema=new mongoose.Schema({
     isLoggedIn:{type:Boolean,default:false},
     token:{type:String,default:null},
     otp:{type:String,default:null},
-    otpExpiry:{type:Date,default:null}
+    otpExpiry:{type:Date,default:null},
+    totalBookings: { type: Number, default: 0 },
+    completedBookings: { type: Number, default: 0 }
 },{timestamps:true})
 
 export const User=mongoose.model("User",userSchema);

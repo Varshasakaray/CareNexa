@@ -6,12 +6,13 @@ import {
   Pill,
   Users,
   Calendar,
-  Shield,
   Activity,
+  Menu,
+  X,
 } from "lucide-react";
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,25 +31,21 @@ const Navbar = () => {
   const accessToken = localStorage.getItem("accessToken");
   const userType = localStorage.getItem("userType");
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Get user data based on userType
   const helperData =
     userType === "helper"
       ? JSON.parse(localStorage.getItem("helper") || "null")
       : null;
-  const patientData =
-    userType === "patient"
-      ? JSON.parse(localStorage.getItem("patient") || "null")
-      : null;
-  const displayUser = user || helperData || patientData;
+
+  const displayUser = user || helperData;
 
   const logoutHandler = async () => {
     try {
       let endpoint = "/user/logout";
       if (userType === "helper") {
         endpoint = "/helper/logout";
-      } else if (userType === "patient") {
-        endpoint = "/patient/logout";
       }
 
       const res = await axios.post(
@@ -90,11 +87,9 @@ const Navbar = () => {
               accessToken
                 ? userType === "helper"
                   ? "/helper/dashboard"
-                  : userType === "patient"
-                    ? "/patient/dashboard"
-                    : userType === "admin"
-                      ? "/admin/dashboard"
-                      : "/dashboard"
+                  : userType === "admin"
+                    ? "/admin/dashboard"
+                    : "/user/dashboard"
                 : "/"
             }
             className="flex items-center gap-2 group"
@@ -152,16 +147,13 @@ const Navbar = () => {
                     to={
                       userType === "helper"
                         ? "/helper/dashboard"
-                        : userType === "patient"
-                          ? "/patient/dashboard"
-                          : userType === "admin"
-                            ? "/admin/dashboard"
-                            : "/dashboard"
+                        : userType === "admin"
+                          ? "/admin/dashboard"
+                          : "/user/dashboard"
                     }
                     className={`relative px-4 py-2 rounded-lg font-semibold transition-all ${
-                      isActive("/dashboard") ||
+                      isActive("/user/dashboard") ||
                       isActive("/helper/dashboard") ||
-                      isActive("/patient/dashboard") ||
                       isActive("/admin/dashboard")
                         ? "text-[#00b4d8] bg-[#caf0f8]/50"
                         : "text-gray-700 hover:text-[#00b4d8] hover:bg-[#caf0f8]/30"
@@ -171,9 +163,8 @@ const Navbar = () => {
                       <LayoutDashboard className="w-4 h-4" />
                       Dashboard
                     </div>
-                    {(isActive("/dashboard") ||
+                    {(isActive("/user/dashboard") ||
                       isActive("/helper/dashboard") ||
-                      isActive("/patient/dashboard") ||
                       isActive("/admin/dashboard")) && (
                       <motion.div
                         layoutId="activeTab"
@@ -295,12 +286,10 @@ const Navbar = () => {
                     onClick={() => {
                       if (userType === "helper") {
                         window.location.href = "/helper/dashboard";
-                      } else if (userType === "patient") {
-                        window.location.href = "/patient/dashboard";
                       } else if (userType === "admin") {
                         window.location.href = "/admin/dashboard";
                       } else {
-                        window.location.href = "/dashboard";
+                        window.location.href = "/user/dashboard";
                       }
                     }}
                     className="cursor-pointer hover:bg-[#caf0f8]/50 focus:bg-[#caf0f8]/50"
@@ -366,8 +355,159 @@ const Navbar = () => {
               </motion.div>
             </>
           )}
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="text-gray-700 hover:text-[#00b4d8] focus:outline-none"
+            >
+              {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t border-[#eae0d5]"
+          >
+            <ul className="flex flex-col p-4 gap-4">
+              {user || accessToken ? (
+                <>
+                  <Link
+                    to="/helper-booking"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                      isActive("/helper-booking")
+                        ? "text-[#ff6b6b] bg-[#ff6b6b]/10"
+                        : "text-gray-700 hover:text-[#ff6b6b] hover:bg-[#ff6b6b]/5"
+                    }`}
+                  >
+                    <Users className="w-5 h-5" />
+                    Home
+                  </Link>
+                  <Link
+                    to={
+                      userType === "helper"
+                        ? "/helper/dashboard"
+                        : userType === "admin"
+                          ? "/admin/dashboard"
+                          : "/user/dashboard"
+                    }
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                      isActive("/user/dashboard") ||
+                      isActive("/helper/dashboard") ||
+                      isActive("/admin/dashboard")
+                        ? "text-[#00b4d8] bg-[#caf0f8]/50"
+                        : "text-gray-700 hover:text-[#00b4d8] hover:bg-[#caf0f8]/30"
+                    }`}
+                  >
+                    <LayoutDashboard className="w-5 h-5" />
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                      isActive("/dashboard") &&
+                      !isActive("/helper/dashboard") &&
+                      !isActive("/patient/dashboard") &&
+                      !isActive("/admin/dashboard")
+                        ? "text-[#00b4d8] bg-[#caf0f8]/50"
+                        : "text-gray-700 hover:text-[#00b4d8] hover:bg-[#caf0f8]/30"
+                    }`}
+                  >
+                    <Activity className="w-5 h-5" />
+                    Health Metrics
+                  </Link>
+                  <Link
+                    to="/medications"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                      isActive("/medications")
+                        ? "text-[#bbd0ff] bg-[#bbd0ff]/20"
+                        : "text-gray-700 hover:text-[#bbd0ff] hover:bg-[#bbd0ff]/10"
+                    }`}
+                  >
+                    <Pill className="w-5 h-5" />
+                    Medications
+                  </Link>
+                  <Link
+                    to="/booking/helpers"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold ${
+                      isActive("/booking/helpers")
+                        ? "text-[#4ecdc4] bg-[#4ecdc4]/20"
+                        : "text-gray-700 hover:text-[#4ecdc4] hover:bg-[#4ecdc4]/10"
+                    }`}
+                  >
+                    <Calendar className="w-5 h-5" />
+                    Browse Helpers
+                  </Link>
+                  <div className="border-t border-gray-100 my-2"></div>
+                  <button
+                    onClick={() => {
+                      logoutHandler();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-red-600 hover:bg-red-50 w-full text-left"
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/features"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 font-semibold text-gray-700 hover:text-[#00b4d8]"
+                  >
+                    Features
+                  </Link>
+                  <Link
+                    to="/about"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="px-4 py-2 font-semibold text-gray-700 hover:text-[#00b4d8]"
+                  >
+                    About
+                  </Link>
+                  <a
+                    href="mailto:support@carenexa.com"
+                    className="px-4 py-2 font-semibold text-gray-700 hover:text-[#00b4d8]"
+                  >
+                    Contact Us
+                  </a>
+                  <div className="flex flex-col gap-3 mt-2">
+                    <Link
+                      to="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <button className="w-full px-6 py-2 bg-gradient-to-r from-[#00b4d8] to-[#bbd0ff] text-white font-semibold rounded-lg shadow-md">
+                        Login
+                      </button>
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <button className="w-full px-6 py-2 border-2 border-[#00b4d8] text-[#00b4d8] font-semibold rounded-lg">
+                        Signup
+                      </button>
+                    </Link>
+                  </div>
+                </>
+              )}
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

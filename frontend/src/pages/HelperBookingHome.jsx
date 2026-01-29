@@ -1,8 +1,8 @@
-import { useNavigate, Link } from 'react-router-dom';
-import { Card } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import Navbar from '../components/Navbar';
-import { getData } from '../context/userContext';
+import { useNavigate, Link } from "react-router-dom";
+import { Card } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import Navbar from "../components/Navbar";
+import { getData } from "../context/userContext";
 
 const HelperBookingHome = () => {
   const navigate = useNavigate();
@@ -17,7 +17,8 @@ const HelperBookingHome = () => {
             🩺 CareNexa Helper Booking
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Connect with verified helpers for hospital visits and medical assistance
+            Connect with verified helpers for hospital visits and medical
+            assistance
           </p>
         </div>
 
@@ -26,26 +27,14 @@ const HelperBookingHome = () => {
             <div className="text-4xl mb-4">👤</div>
             <h2 className="text-2xl font-semibold mb-2">I'm a Patient</h2>
             <p className="text-gray-600 mb-4">
-              Need help with hospital visits? Book a verified helper in your area.
+              Need help with hospital visits? Book a verified helper in your
+              area.
             </p>
             <div className="space-y-2">
-              <Button 
-                className="w-full" 
-                onClick={() => navigate('/patient/register')}
-              >
-                Register as Patient
-              </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
-                onClick={() => navigate('/patient/login')}
-              >
-                Patient Login
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => navigate('/booking/helpers')}
+                onClick={() => navigate("/booking/helpers")}
               >
                 Browse Helpers
               </Button>
@@ -59,28 +48,31 @@ const HelperBookingHome = () => {
               Offer your services and help patients with their medical needs.
             </p>
             <div className="space-y-2">
-              <Button 
-                className="w-full" 
-                onClick={() => navigate('/helper/register')}
+              <Button
+                className="w-full"
+                onClick={() => navigate("/helper/register")}
               >
                 Register as Helper
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full"
-                onClick={() => navigate('/helper/login')}
+                onClick={() => navigate("/helper/login")}
               >
                 Helper Login
               </Button>
             </div>
           </Card>
         </div>
-        
+
         {!user && (
           <div className="mt-12 text-center">
-             <Link to="/login" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
-               Admin Login
-             </Link>
+            <Link
+              to="/login"
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              Admin Login
+            </Link>
           </div>
         )}
 
@@ -90,19 +82,27 @@ const HelperBookingHome = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div>
                 <div className="font-semibold mb-2">1. Register</div>
-                <p className="text-gray-600">Create your account as patient or helper</p>
+                <p className="text-gray-600">
+                  Create your account to get started
+                </p>
               </div>
               <div>
                 <div className="font-semibold mb-2">2. Browse/Offer</div>
-                <p className="text-gray-600">Patients find helpers, helpers set availability</p>
+                <p className="text-gray-600">
+                  Patients find helpers, helpers set availability
+                </p>
               </div>
               <div>
                 <div className="font-semibold mb-2">3. Book</div>
-                <p className="text-gray-600">Create booking with verified OTP system</p>
+                <p className="text-gray-600">
+                  Create booking with verified OTP system
+                </p>
               </div>
               <div>
                 <div className="font-semibold mb-2">4. Complete</div>
-                <p className="text-gray-600">Finish duty and rate the experience</p>
+                <p className="text-gray-600">
+                  Finish duty and rate the experience
+                </p>
               </div>
             </div>
           </Card>

@@ -16,7 +16,6 @@ const ProtectedRoute = ({ children, userType }) => {
   // If no token, redirect to appropriate login
   if (!token) {
     if (userType === "helper") return <Navigate to={"/helper/login"} />;
-    if (userType === "patient") return <Navigate to={"/patient/login"} />;
     if (userType === "admin") return <Navigate to={"/login"} />;
     return <Navigate to={"/login"} />;
   }
@@ -36,14 +35,22 @@ const ProtectedRoute = ({ children, userType }) => {
 
   // If userType is specified, check if it matches
   if (userType && storedUserType !== userType && userType !== "admin") {
+    // Redirect helpers to their dashboard if they try to access patient routes
+    if (storedUserType === "helper" && userType === "patient") {
+      return <Navigate to={"/helper/dashboard"} />;
+    }
+
     if (userType === "helper") return <Navigate to={"/helper/login"} />;
-    if (userType === "patient") return <Navigate to={"/patient/login"} />;
   }
 
   // For regular user routes, check context
   if (!userType && !user) {
     // Allow patients to access general health routes (dashboard, medications, etc.)
     if (storedUserType === "patient" && localStorage.getItem("patient")) {
+      return <div>{children}</div>;
+    }
+    // Allow generic users to access (will be handled by component)
+    if (storedUserType === "user" || !storedUserType) {
       return <div>{children}</div>;
     }
     // Allow helpers to access general health routes

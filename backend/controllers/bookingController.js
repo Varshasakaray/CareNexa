@@ -1,6 +1,5 @@
 import { Booking } from "../models/bookingModel.js";
 import { Helper } from "../models/helperModel.js";
-import { Patient } from "../models/patientModel.js";
 import { User } from "../models/userModel.js";
 import { Rating } from "../models/ratingModel.js";
 import { calculateBookingPrice } from "../utils/calculatePrice.js";
@@ -141,7 +140,7 @@ export const calculatePrice = async (req, res) => {
  */
 export const createBooking = async (req, res) => {
   try {
-    const patientId = req.userId;
+    const userId = req.userId;
     const {
       helperId,
       patientAddress,
@@ -212,7 +211,7 @@ export const createBooking = async (req, res) => {
 
     // Create booking
     const booking = await Booking.create({
-      patientId,
+      userId,
       helperId,
       patientAddress,
       hospitalName,
@@ -231,7 +230,6 @@ export const createBooking = async (req, res) => {
     await helper.save();
 
     // Send notification to helper
-    const patient = await Patient.findById(patientId);
     await sendBookingNotificationToHelper(helper.email, helper.fullName, {
       patientAddress,
       hospitalName,
@@ -301,9 +299,11 @@ export const acceptBooking = async (req, res) => {
     booking.otpExpiry = otpExpiry;
     await booking.save();
 
-    // Send OTP to patient
-    const patient = await Patient.findById(booking.patientId);
-    await sendBookingOTPToPatient(patient.email, patient.fullName, otp);
+    // Send OTP to patient (User)
+    const user = await User.findById(booking.userId);
+    if (user) {
+      await sendBookingOTPToPatient(user.email, user.username, otp);
+    }
 
     return res.status(200).json({
       success: true,
@@ -489,11 +489,13 @@ export const completeDuty = async (req, res) => {
     helper.isAvailable = true; // Set back to available
     await helper.save();
 
-    // Update patient stats
-    const patient = await Patient.findById(booking.patientId);
-    patient.completedBookings += 1;
-    patient.totalBookings += 1;
-    await patient.save();
+    // Update user stats
+    const user = await User.findById(booking.userId);
+    if (user) {
+      user.completedBookings = (user.completedBookings || 0) + 1;
+      user.totalBookings = (user.totalBookings || 0) + 1;
+      await user.save();
+    }
 
     return res.status(200).json({
       success: true,
@@ -510,11 +512,11 @@ export const completeDuty = async (req, res) => {
 };
 
 /**
- * Cancel Booking (Patient)
+ * Cancel Booking (Patient/User)
  */
 export const cancelBooking = async (req, res) => {
   try {
-    const patientId = req.userId;
+    const userId = req.userId;
     const { bookingId } = req.params;
     const { reason } = req.body;
 
@@ -526,7 +528,7 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
-    if (booking.patientId.toString() !== patientId.toString()) {
+    if (booking.userId.toString() !== userId.toString()) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized access",
@@ -574,11 +576,11 @@ export const cancelBooking = async (req, res) => {
 };
 
 /**
- * Rate Helper (Patient)
+ * Rate Helper (Patient/User)
  */
 export const rateHelper = async (req, res) => {
   try {
-    const patientId = req.userId;
+    const userId = req.userId;
     const { bookingId } = req.params;
     const { rating, feedback } = req.body;
 
@@ -597,7 +599,7 @@ export const rateHelper = async (req, res) => {
       });
     }
 
-    if (booking.patientId.toString() !== patientId.toString()) {
+    if (booking.userId.toString() !== userId.toString()) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized access",
@@ -628,7 +630,7 @@ export const rateHelper = async (req, res) => {
     await Rating.create({
       bookingId,
       helperId: booking.helperId,
-      patientId,
+      userId,
       rating,
       feedback: feedback || null,
     });
@@ -675,13 +677,13 @@ export const rateHelper = async (req, res) => {
 };
 
 /**
- * Get Booking History (Patient)
+ * Get Booking History (Patient/User)
  */
 export const getBookingHistory = async (req, res) => {
   try {
-    const patientId = req.userId;
+    const userId = req.userId;
 
-    const bookings = await Booking.find({ patientId })
+    const bookings = await Booking.find({ userId })
       .populate("helperId", "fullName profilePhoto averageRating")
       .sort({ createdAt: -1 });
 
@@ -706,7 +708,7 @@ export const getHelperBookings = async (req, res) => {
     const helperId = req.userId;
 
     const bookings = await Booking.find({ helperId })
-      .populate("patientId", "fullName mobileNumber")
+      .populate("userId", "username email")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({

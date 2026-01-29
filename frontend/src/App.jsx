@@ -6,6 +6,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import Verify from "./pages/Verify";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import ForgotPassword from "./pages/ForgotPassword";
 import VerifyOTP from "./pages/VerifyOTP";
 import ChangePassword from "./pages/ChangePassword";
@@ -18,14 +19,11 @@ import HelperRegister from "./pages/HelperRegister";
 import HelperLogin from "./pages/HelperLogin";
 import HelperPayment from "./pages/HelperPayment";
 import HelperDashboard from "./pages/HelperDashboard";
-import PatientRegister from "./pages/PatientRegister";
-import PatientLogin from "./pages/PatientLogin";
-import PatientDashboard from "./pages/PatientDashboard";
+import UserDashboard from "./pages/UserDashboard";
 import BrowseHelpers from "./pages/BrowseHelpers";
 import CreateBooking from "./pages/CreateBooking";
 import AdminDashboard from "./pages/AdminDashboard";
 import HelperBookingHome from "./pages/HelperBookingHome";
-import PatientVerifyEmail from "./pages/PatientVerifyEmail";
 import Home from "./pages/Home";
 import Features from "./pages/Features";
 import About from "./pages/About";
@@ -49,6 +47,7 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Navbar />
         <Dashboard />
+        <Footer />
       </ProtectedRoute>
     ),
   },
@@ -58,6 +57,7 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Navbar />
         <HealthMetricsForm />
+        <Footer />
       </ProtectedRoute>
     ),
   },
@@ -67,6 +67,7 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Navbar />
         <HealthMetricsForm />
+        <Footer />
       </ProtectedRoute>
     ),
   },
@@ -76,6 +77,7 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Navbar />
         <Medications />
+        <Footer />
       </ProtectedRoute>
     ),
   },
@@ -85,6 +87,7 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Navbar />
         <MedicationForm />
+        <Footer />
       </ProtectedRoute>
     ),
   },
@@ -94,95 +97,143 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Navbar />
         <MedicationForm />
+        <Footer />
       </ProtectedRoute>
     ),
   },
   {
     path: "/signup",
-    element: <Signup />,
+    element: (
+      <>
+        <Signup />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <>
+        <Login />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/verify",
-    element: <VerifyEmail />,
+    element: (
+      <>
+        <VerifyEmail />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/verify/:token",
-    element: <Verify />,
+    element: (
+      <>
+        <Verify />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/forgot-password",
-    element: <ForgotPassword />,
+    element: (
+      <>
+        <ForgotPassword />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/verify-otp/:email",
-    element: <VerifyOTP />,
+    element: (
+      <>
+        <VerifyOTP />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/change-password/:email",
-    element: <ChangePassword />,
+    element: (
+      <>
+        <ChangePassword />
+        <Footer />
+      </>
+    ),
   },
   // Helper Booking System Routes
   {
     path: "/helper/register",
-    element: <HelperRegister />,
+    element: (
+      <>
+        <HelperRegister />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/helper/login",
-    element: <HelperLogin />,
+    element: (
+      <>
+        <HelperLogin />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/helper/payment",
-    element: <HelperPayment />,
+    element: (
+      <>
+        <HelperPayment />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/helper/dashboard",
     element: (
       <ProtectedRoute userType="helper">
         <HelperDashboard />
+        <Footer />
       </ProtectedRoute>
     ),
   },
   {
-    path: "/patient/register",
-    element: <PatientRegister />,
-  },
-  {
-    path: "/patient/login",
-    element: <PatientLogin />,
-  },
-  {
-    path: "/patient/verify/:token",
-    element: <PatientVerifyEmail />,
-  },
-  {
-    path: "/patient/dashboard",
+    path: "/user/dashboard",
     element: (
-      <ProtectedRoute userType="patient">
-        <PatientDashboard />
+      <ProtectedRoute>
+        <UserDashboard />
+        <Footer />
       </ProtectedRoute>
     ),
   },
   {
     path: "/booking/helpers",
-    element: <BrowseHelpers />,
+    element: (
+      <>
+        <BrowseHelpers />
+        <Footer />
+      </>
+    ),
   },
   {
     path: "/booking/helper/:helperId",
     element: (
       <ProtectedRoute>
         <CreateBooking />
+        <Footer />
       </ProtectedRoute>
     ),
   },
   {
-    path: "/patient/bookings",
+    path: "/user/bookings",
     element: (
-      <ProtectedRoute userType="patient">
-        <PatientDashboard />
+      <ProtectedRoute>
+        <UserDashboard />
+        <Footer />
       </ProtectedRoute>
     ),
   },
@@ -191,12 +242,18 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute userType="admin">
         <AdminDashboard />
+        <Footer />
       </ProtectedRoute>
     ),
   },
   {
     path: "/helper-booking",
-    element: <HelperBookingHome />,
+    element: (
+      <>
+        <HelperBookingHome />
+        <Footer />
+      </>
+    ),
   },
 ]);
 const App = () => {
