@@ -7,6 +7,7 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
+import PaymentModal from "../components/PaymentModal";
 
 const CreateBooking = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const CreateBooking = () => {
     appointmentTime: "",
     isEmergency: false,
   });
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   useEffect(() => {
     loadHelperDetails();
@@ -65,22 +67,28 @@ const CreateBooking = () => {
     setFormData({ ...formData, [e.target.name]: value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
+    setIsPaymentModalOpen(true);
+  };
+
+  const handlePaymentSuccess = async (paymentDetails) => {
+    setIsPaymentModalOpen(false);
     setLoading(true);
 
     try {
       const response = await bookingAPI.create({
         helperId,
         ...formData,
+        paymentDetails,
       });
 
       if (response.data.success) {
-        toast.success("Booking created! Waiting for helper response.");
+        toast.success("Payment Successful! Booking created.");
         navigate("/user/bookings");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create booking");
+      toast.error(error.response?.data?.message || "Booking failed after payment");
     } finally {
       setLoading(false);
     }
@@ -234,6 +242,13 @@ const CreateBooking = () => {
           </form>
         </Card>
       </div>
+
+      <PaymentModal
+        isOpen={isPaymentModalOpen}
+        onClose={() => setIsPaymentModalOpen(false)}
+        onPaymentSuccess={handlePaymentSuccess}
+        amount={priceDetails?.totalPrice || 0}
+      />
     </div>
   );
 };

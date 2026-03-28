@@ -2,6 +2,8 @@ import { Booking } from "../models/bookingModel.js";
 import { Helper } from "../models/helperModel.js";
 import { User } from "../models/userModel.js";
 import { Rating } from "../models/ratingModel.js";
+import { Transaction } from "../models/transactionModel.js";
+import mongoose from "mongoose";
 import { calculateBookingPrice } from "../utils/calculatePrice.js";
 import { generateOTP, getOTPExpiry } from "../utils/generateOTP.js";
 import {
@@ -139,6 +141,9 @@ export const calculatePrice = async (req, res) => {
  * Create Booking
  */
 export const createBooking = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const userId = req.userId;
     const {
@@ -147,12 +152,13 @@ export const createBooking = async (req, res) => {
       hospitalName,
       appointmentTime,
       isEmergency,
+      paymentDetails, // New field for payment
     } = req.body;
 
-    if (!helperId || !patientAddress || !appointmentTime) {
+    if (!helperId || !patientAddress || !appointmentTime || !paymentDetails) {
       return res.status(400).json({
         success: false,
-        message: "All required fields are missing",
+        message: "All required fields (including payment) are missing",
       });
     }
 
@@ -177,23 +183,27 @@ export const createBooking = async (req, res) => {
       });
     }
 
-    // Check helper availability
-    const helper = await Helper.findById(helperId);
+    // [ACID: Isolation] Check helper availability within transaction
+    const helper = await Helper.findById(helperId).session(session);
     if (!helper || !helper.isActive || !helper.isAvailable) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Helper is not available for booking",
       });
     }
 
-    // Check if helper is already booked
+    // [ACID: Isolation] Check if helper is already booked for this slot
     const existingBooking = await Booking.findOne({
       helperId,
       status: { $in: ["pending", "accepted", "otp_sent", "otp_verified"] },
       appointmentTime: { $gte: now },
-    });
+    }).session(session);
 
     if (existingBooking) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(400).json({
         success: false,
         message: "Helper is already booked for this time slot",
@@ -206,46 +216,97 @@ export const createBooking = async (req, res) => {
       isEmergency || false,
     );
 
-    // Set helper response deadline (e.g., 10 minutes)
+    // Set helper response deadline (10 minutes)
     const responseDeadline = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Create booking
-    const booking = await Booking.create({
-      userId,
-      helperId,
-      patientAddress,
-      hospitalName,
-      appointmentTime: appointmentDate,
-      basePrice: priceDetails.basePrice,
-      earlyMorningCharge: priceDetails.earlyMorningCharge,
-      nightCharge: priceDetails.nightCharge,
-      emergencyCharge: priceDetails.emergencyCharge,
-      totalPrice: priceDetails.totalPrice,
-      status: "pending",
-      helperResponseDeadline: responseDeadline,
-    });
+    // [ACID: Atomicity] 1. Create booking (Pending status)
+    const [booking] = await Booking.create(
+      [
+        {
+          userId,
+          helperId,
+          patientAddress,
+          hospitalName,
+          appointmentTime: appointmentDate,
+          basePrice: priceDetails.basePrice,
+          earlyMorningCharge: priceDetails.earlyMorningCharge,
+          nightCharge: priceDetails.nightCharge,
+          emergencyCharge: priceDetails.emergencyCharge,
+          totalPrice: priceDetails.totalPrice,
+          status: "pending",
+          helperResponseDeadline: responseDeadline,
+          paymentStatus: "pending", // Will update after simulation
+        },
+      ],
+      { session },
+    );
 
-    // Set helper as unavailable
+    // [ACID: Atomicity] 2. Simulate Payment Gateway call from scratch
+    // In a real scenario, this would be an external API call.
+    // For ACID, we MUST ensure this succeed before committing.
+    const transactionId = `TXN_${Date.now()}_${Math.random()
+      .toString(36)
+      .substring(2, 9)
+      .toUpperCase()}`;
+
+    // Simple validation simulation
+    const { cardNumber } = paymentDetails;
+    if (cardNumber === "0000000000000000") {
+      // Simulate failed card for testing ACID rollback
+      throw new Error("Payment declined by bank");
+    }
+
+    // [ACID: Atomicity] 3. Create Transaction record
+    await Transaction.create(
+      [
+        {
+          bookingId: booking._id,
+          userId,
+          amount: priceDetails.totalPrice,
+          status: "success",
+          transactionId,
+          cardLast4: cardNumber.slice(-4),
+        },
+      ],
+      { session },
+    );
+
+    // [ACID: Consistency] 4. Update Booking and Helper states
+    booking.paymentStatus = "completed";
+    booking.paymentTransactionId = transactionId;
+    await booking.save({ session });
+
     helper.isAvailable = false;
-    await helper.save();
+    await helper.save({ session });
 
-    // Send notification to helper
-    await sendBookingNotificationToHelper(helper.email, helper.fullName, {
+    // Commit all changes
+    await session.commitTransaction();
+    session.endSession();
+
+    // After commit, send notification (Async-ish)
+    sendBookingNotificationToHelper(helper.email, helper.fullName, {
       patientAddress,
       hospitalName,
       appointmentTime: appointmentDate,
       totalPrice: priceDetails.totalPrice,
-    });
+    }).catch((err) => console.log("Notification error:", err));
 
     return res.status(201).json({
       success: true,
-      message: "Booking created successfully. Waiting for helper response.",
-      data: booking,
+      message: "Payment successful and booking created.",
+      data: {
+        booking,
+        transactionId,
+      },
     });
   } catch (error) {
+    // [ACID: Durability/Consistency] Abort rollbacks all changes in session
+    await session.abortTransaction();
+    session.endSession();
+
     return res.status(500).json({
       success: false,
-      message: error.message,
+      message: error.message || "An error occurred during booking",
     });
   }
 };
