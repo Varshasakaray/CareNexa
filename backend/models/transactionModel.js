@@ -45,6 +45,5 @@ const transactionSchema = new mongoose.Schema(
 // Indexes
 transactionSchema.index({ bookingId: 1 });
 transactionSchema.index({ userId: 1 });
-transactionSchema.index({ transactionId: 1 }, { unique: true });
 
 export const Transaction = mongoose.model("Transaction", transactionSchema);

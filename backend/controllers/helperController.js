@@ -1,5 +1,7 @@
 import { Helper } from '../models/helperModel.js';
 import { Pricing } from '../models/pricingModel.js';
+import { Transaction } from '../models/transactionModel.js';
+import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { getAadhaarLast4 } from '../utils/aadhaarMask.js';
@@ -122,18 +124,23 @@ export const registerHelper = async (req, res) => {
  * Complete Registration Payment
  */
 export const completeRegistrationPayment = async (req, res) => {
-    try {
-        const { helperId, transactionId } = req.body;
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-        if (!helperId || !transactionId) {
+    try {
+        const { helperId, paymentDetails } = req.body;
+
+        if (!helperId || !paymentDetails) {
             return res.status(400).json({
                 success: false,
-                message: 'Helper ID and transaction ID are required'
+                message: 'Helper ID and payment details are required'
             });
         }
 
-        const helper = await Helper.findById(helperId);
+        const helper = await Helper.findById(helperId).session(session);
         if (!helper) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({
                 success: false,
                 message: 'Helper not found'
@@ -141,24 +148,61 @@ export const completeRegistrationPayment = async (req, res) => {
         }
 
         if (helper.registrationPaid) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({
                 success: false,
                 message: 'Registration payment already completed'
             });
         }
 
+        // Get registration fee
+        const pricing = await Pricing.getCurrentPricing();
+        const amount = pricing.registrationFee;
+
+        // [ACID: Atomicity] Simulate Payment Gateway call from scratch
+        const transactionId = `REG_TXN_${Date.now()}_${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+
+        // Simple validation simulation (Reuse the same 'declined' card for testing)
+        const { cardNumber } = paymentDetails;
+        if (cardNumber === "0000000000000000") {
+            throw new Error("Payment declined by bank");
+        }
+
+        // [ACID: Atomicity] 1. Create Transaction record using specialized model
+        await Transaction.create([{
+            bookingId: helper._id, // Using helperId as reference for original payment
+            userId: helper._id, // Helper is the user in this context
+            amount: amount,
+            status: "success",
+            transactionId,
+            cardLast4: cardNumber.slice(-4),
+        }], { session });
+
+        // [ACID: Consistency] 2. Update Helper state
         helper.registrationPaid = true;
         helper.paymentTransactionId = transactionId;
-        await helper.save();
+        await helper.save({ session });
+
+        // Commit all changes
+        await session.commitTransaction();
+        session.endSession();
 
         return res.status(200).json({
             success: true,
-            message: 'Registration payment completed. Waiting for admin verification.'
+            message: 'Registration payment successful. Waiting for admin verification.',
+            data: {
+                transactionId
+            }
         });
     } catch (error) {
+        // [ACID: Durability/Consistency] Rollback all changes
+        await session.abortTransaction();
+        session.endSession();
+
         return res.status(500).json({
             success: false,
-            message: error.message
+            message: error.message || 'An error occurred during payment'
         });
     }
 };

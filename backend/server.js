@@ -12,6 +12,7 @@ import cors from "cors"
 import { startMedicationReminderCron } from "./cron/medicationReminderCron.js";
 import { startBookingAutoFailCron } from "./cron/bookingAutoFailCron.js";
 import path from "path";
+import fs from "fs";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -43,6 +44,13 @@ app.use('/admin',adminRoute) //http://localhost:8000/admin/helpers
 
 
 app.listen((PORT), async ()=>{
+    // Ensure uploads directory exists on startup
+    const uploadDir = path.join(__dirname, "uploads");
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+        console.log("Uploads directory created on startup");
+    }
+
     const dbConnected = await connectDB();
     if (dbConnected) {
         startMedicationReminderCron();

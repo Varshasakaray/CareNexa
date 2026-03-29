@@ -7,12 +7,13 @@ import { Label } from '../components/ui/label';
 import { Card } from '../components/ui/card';
 import { toast } from 'sonner';
 import Navbar from '../components/Navbar';
+import PaymentModal from '../components/PaymentModal';
 
 const HelperPayment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const [transactionId, setTransactionId] = useState('');
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
   const helperId = location.state?.helperId;
   const registrationFee = location.state?.registrationFee || 10;
@@ -24,22 +25,22 @@ const HelperPayment = () => {
     }
   }, [helperId, navigate]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!transactionId.trim()) {
-      toast.error('Please enter transaction ID');
-      return;
-    }
+    setIsPaymentModalOpen(true);
+  };
 
+  const handlePaymentSuccess = async (paymentDetails) => {
+    setIsPaymentModalOpen(false);
     setLoading(true);
     try {
-      const response = await helperAPI.payment({ helperId, transactionId });
+      const response = await helperAPI.payment({ helperId, paymentDetails });
       if (response.data.success) {
-        toast.success('Payment completed! Waiting for admin verification.');
-        navigate('/helper/login');
+        toast.success("Payment Successful! Waiting for admin verification.");
+        navigate("/helper/login");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Payment failed');
+      toast.error(error.response?.data?.message || "Payment failed");
     } finally {
       setLoading(false);
     }
@@ -55,26 +56,38 @@ const HelperPayment = () => {
           <p className="text-center text-2xl font-bold text-blue-600">₹{registrationFee}</p>
           <p className="text-center text-sm text-gray-600 mt-2">Registration Fee</p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="transactionId">Transaction ID *</Label>
-            <Input
-              id="transactionId"
-              name="transactionId"
-              type="text"
-              required
-              value={transactionId}
-              onChange={(e) => setTransactionId(e.target.value)}
-              placeholder="Enter payment transaction ID"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Complete payment of ₹{registrationFee} and enter the transaction ID here
+        <div className="space-y-4">
+          <div className="text-center p-4 border border-blue-100 rounded-xl bg-blue-50/50">
+            <p className="text-sm text-blue-600 font-medium mb-1">Total Due</p>
+            <p className="text-4xl font-black text-blue-900">₹{registrationFee}</p>
+          </div>
+          
+          <div className="space-y-2 text-sm text-gray-600">
+            <p className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
+              Secure 256-bit encrypted payment
+            </p>
+            <p className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 bg-blue-400 rounded-full"></span>
+              Instant verification
             </p>
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Processing...' : 'Complete Payment'}
+
+          <Button 
+            onClick={handleSubmit} 
+            className="w-full h-12 text-lg font-bold bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-100 transition-all active:scale-[0.98]" 
+            disabled={loading}
+          >
+            {loading ? 'Processing...' : 'Proceed to Payment'}
           </Button>
-        </form>
+        </div>
+
+        <PaymentModal
+          isOpen={isPaymentModalOpen}
+          onClose={() => setIsPaymentModalOpen(false)}
+          onPaymentSuccess={handlePaymentSuccess}
+          amount={registrationFee}
+        />
         </Card>
       </div>
     </div>
