@@ -8,6 +8,8 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { toast } from 'sonner';
 import Navbar from '../components/Navbar';
+import ChatModal from '../components/Chat/ChatModal';
+import { MessageCircle } from 'lucide-react';
 
 const HelperDashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +17,8 @@ const HelperDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [otp, setOtp] = useState({});
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -333,6 +337,20 @@ const HelperDashboard = () => {
                       Complete Duty
                     </Button>
                   )}
+
+                  {/* Chat Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 ml-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white"
+                    onClick={() => {
+                      setSelectedBooking(booking);
+                      setIsChatOpen(true);
+                    }}
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Chat with Patient
+                  </Button>
                 </div>
               ))}
             </div>
@@ -348,13 +366,40 @@ const HelperDashboard = () => {
               <div>
                 <p className="font-semibold">{booking.hospitalName}</p>
                 <p className="text-sm text-gray-600">{new Date(booking.appointmentTime).toLocaleString()}</p>
+                <p className="text-xs text-gray-500">Patient: {booking.userId?.username}</p>
               </div>
-              <Badge>{booking.status}</Badge>
+              <div className="flex items-center gap-2">
+                <Badge>{booking.status}</Badge>
+                {["accepted", "otp_sent", "otp_verified", "duty_completed"].includes(booking.status) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedBooking(booking);
+                      setIsChatOpen(true);
+                    }}
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
             </div>
           ))}
         </div>
       </Card>
       </div>
+
+      {/* Chat Modal Integration */}
+      {selectedBooking && (
+        <ChatModal
+          isOpen={isChatOpen}
+          onClose={() => setIsChatOpen(false)}
+          bookingId={selectedBooking._id}
+          currentUserId={helper._id}
+          currentUserType="Helper"
+          otherPartyName={selectedBooking.userId?.username || "Patient"}
+        />
+      )}
     </div>
   );
 };

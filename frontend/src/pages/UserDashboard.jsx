@@ -7,12 +7,16 @@ import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
 import { toast } from "sonner";
 import Navbar from "../components/Navbar";
+import ChatModal from "../components/Chat/ChatModal";
+import { MessageCircle } from "lucide-react";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
 
   useEffect(() => {
     loadData();
@@ -180,11 +184,39 @@ const UserDashboard = () => {
                       Cancel Booking
                     </Button>
                   )}
+
+                  {/* Chat Button - Only after acceptance */}
+                  {["accepted", "otp_sent", "otp_verified", "duty_completed"].includes(booking.status) && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2 ml-2 border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white"
+                      onClick={() => {
+                        setSelectedBooking(booking);
+                        setIsChatOpen(true);
+                      }}
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Chat with Helper
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </Card>
+
+        {/* Chat Modal Integration */}
+        {selectedBooking && (
+          <ChatModal
+            isOpen={isChatOpen}
+            onClose={() => setIsChatOpen(false)}
+            bookingId={selectedBooking._id}
+            currentUserId={user._id}
+            currentUserType="User"
+            otherPartyName={selectedBooking.helperId?.fullName || "Helper"}
+          />
+        )}
       </div>
     </div>
   );

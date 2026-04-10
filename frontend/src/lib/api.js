@@ -107,4 +107,10 @@ export const adminAPI = {
   updatePricing: (data) => api.put("/admin/pricing", data),
 };
 
+// Chat API
+export const chatAPI = {
+  getHistory: (bookingId) => api.get(`/chat/${bookingId}`),
+  markAsRead: (bookingId) => api.put(`/chat/${bookingId}/read`),
+};
+
 export default api;
