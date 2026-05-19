@@ -30,8 +30,10 @@ export const verifyMail = async (token, email) => {
   };
   try {
     const info = await transporter.sendMail(emailConfigurations);
-    console.log("Email sent successfully:", info.response);
+    console.log(`Verification email sent successfully to ${email}:`, info.response);
+    return true;
   } catch (error) {
-    console.error("Email error:", error.message);
+    console.error(`Error sending verification email to ${email}:`, error.message);
+    return false;
   }
 };

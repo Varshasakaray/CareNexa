@@ -279,6 +279,15 @@ export const createBooking = async (req, res) => {
     helper.isAvailable = false;
     await helper.save({ session });
 
+    // Update total bookings count for user and helper
+    const user = await User.findById(userId).session(session);
+    if (user) {
+      user.totalBookings = (user.totalBookings || 0) + 1;
+      await user.save({ session });
+    }
+    helper.totalBookings = (helper.totalBookings || 0) + 1;
+    await helper.save({ session });
+
     // Commit all changes
     await session.commitTransaction();
     session.endSession();
@@ -355,20 +364,38 @@ export const acceptBooking = async (req, res) => {
     const otp = generateOTP();
     const otpExpiry = getOTPExpiry(10);
 
-    booking.status = "accepted";
+    booking.status = "otp_sent";
     booking.bookingOTP = otp;
     booking.otpExpiry = otpExpiry;
     await booking.save();
 
     // Send OTP to patient (User)
     const user = await User.findById(booking.userId);
-    if (user) {
-      await sendBookingOTPToPatient(user.email, user.username, otp);
+    if (!user) {
+      console.log(`User not found for booking: ${bookingId}`);
+      return res.status(404).json({
+        success: false,
+        message: "Patient user not found. Could not send OTP.",
+      });
+    }
+
+    console.log(`Attempting to send OTP to patient email: ${user.email}`);
+    const emailSent = await sendBookingOTPToPatient(
+      user.email,
+      user.username,
+      otp,
+    );
+    if (!emailSent) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "Failed to send OTP email to patient. Please check email configuration.",
+      });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Booking accepted. OTP sent to patient.",
+      message: "Booking accepted. Verification OTP sent to patient.",
       data: booking,
     });
   } catch (error) {
@@ -417,6 +444,15 @@ export const rejectBooking = async (req, res) => {
     helper.isAvailable = true;
     await helper.save();
 
+    // Update cancelled bookings count for user and helper
+    const user = await User.findById(userId);
+    if (user) {
+      user.cancelledBookings = (user.cancelledBookings || 0) + 1;
+      await user.save();
+    }
+    helper.cancelledBookings = (helper.cancelledBookings || 0) + 1;
+    await helper.save();
+
     return res.status(200).json({
       success: true,
       message: "Booking rejected successfully",
@@ -460,7 +496,7 @@ export const verifyBookingOTP = async (req, res) => {
       });
     }
 
-    if (booking.status !== "accepted") {
+    if (booking.status !== "otp_sent") {
       return res.status(400).json({
         success: false,
         message: `OTP verification not allowed. Current status: ${booking.status}`,
@@ -546,7 +582,6 @@ export const completeDuty = async (req, res) => {
     // Update helper stats
     const helper = await Helper.findById(helperId);
     helper.completedDuties += 1;
-    helper.totalBookings += 1;
     helper.isAvailable = true; // Set back to available
     await helper.save();
 
@@ -554,7 +589,6 @@ export const completeDuty = async (req, res) => {
     const user = await User.findById(booking.userId);
     if (user) {
       user.completedBookings = (user.completedBookings || 0) + 1;
-      user.totalBookings = (user.totalBookings || 0) + 1;
       await user.save();
     }
 

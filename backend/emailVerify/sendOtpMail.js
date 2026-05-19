@@ -1,21 +1,28 @@
-import nodemailer from "nodemailer"
-import "dotenv/config"
+import nodemailer from "nodemailer";
+import "dotenv/config";
 
-export const sendOtpMail = async(email, otp) =>{
+export const sendOtpMail = async (email, otp) => {
+  try {
     const transporter = nodemailer.createTransport({
-        service:'gmail',
-        auth:{
-            user:process.env.EMAIL_USER,
-            pass:process.env.EMAIL_PASS
-        }
-    })
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
 
     const mailOptions = {
-        from:process.env.EMAIL_USER,
-        to:email,
-        subject:'Password reset OTP',
-        html:`<p>Your OTP for password reset is: <b>${otp}</b>. It is valid for 10 minutes.</p>`
-    }
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password reset OTP",
+      html: `<p>Your OTP for password reset is: <b>${otp}</b>. It is valid for 10 minutes.</p>`,
+    };
 
-    await transporter.sendMail(mailOptions)
-}
+    await transporter.sendMail(mailOptions);
+    console.log(`Password reset OTP sent to: ${email}`);
+    return true;
+  } catch (error) {
+    console.error(`Error sending password reset OTP to ${email}:`, error);
+    return false;
+  }
+};

@@ -67,6 +67,7 @@ const helperSchema = new mongoose.Schema({
     // Stats
     totalBookings: { type: Number, default: 0 },
     completedDuties: { type: Number, default: 0 },
+    cancelledBookings: { type: Number, default: 0 },
     averageRating: { type: Number, default: 0 },
     totalRatings: { type: Number, default: 0 },
     
