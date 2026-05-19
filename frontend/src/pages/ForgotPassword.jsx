@@ -31,7 +31,9 @@ const ForgotPassword = () => {
             }
         } catch (error) {
             console.log(error);
-            
+            const errorMessage = error.response?.data?.message || "Something went wrong. Please try again."
+            setError(errorMessage)
+            toast.error(errorMessage)
         } finally{
             setIsLoading(false)
         }

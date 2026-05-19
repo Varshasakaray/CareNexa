@@ -109,10 +109,11 @@ const UserDashboard = () => {
         <Card className="p-6">
           <h2 className="text-2xl font-semibold">{user.username}</h2>
           <p className="text-gray-600">{user.email}</p>
-          <p className="text-sm text-gray-500 mt-2">
-            Total Bookings: {user.totalBookings || 0} | Completed:{" "}
-            {user.completedBookings || 0}
-          </p>
+          <div className="flex gap-4 mt-2 text-sm text-gray-500">
+            <p>Total Bookings: {user.totalBookings || 0}</p>
+            <p className="text-green-600">Completed: {user.completedBookings || 0}</p>
+            <p className="text-red-600">Cancelled: {user.cancelledBookings || 0}</p>
+          </div>
         </Card>
 
         <Card className="p-6">
@@ -139,7 +140,7 @@ const UserDashboard = () => {
                     </div>
                   </div>
 
-                  {booking.status === "accepted" && (
+                  {booking.status === "otp_sent" && (
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm font-semibold text-blue-800">
                         OTP sent to your email. Please share it with your helper
@@ -174,7 +175,9 @@ const UserDashboard = () => {
                     </p>
                   )}
 
-                  {["pending", "accepted"].includes(booking.status) && (
+                  {["pending", "accepted", "otp_sent"].includes(
+                    booking.status,
+                  ) && (
                     <Button
                       variant="destructive"
                       size="sm"
@@ -186,7 +189,12 @@ const UserDashboard = () => {
                   )}
 
                   {/* Chat Button - Only after acceptance */}
-                  {["accepted", "otp_sent", "otp_verified", "duty_completed"].includes(booking.status) && (
+                  {[
+                    "accepted",
+                    "otp_sent",
+                    "otp_verified",
+                    "duty_completed",
+                  ].includes(booking.status) && (
                     <Button
                       variant="outline"
                       size="sm"

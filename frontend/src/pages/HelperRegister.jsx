@@ -69,7 +69,7 @@ const HelperRegister = () => {
       const response = await helperAPI.register(data);
       
       if (response.data.success) {
-        toast.success('Registration successful! Please complete payment.');
+        toast.success('Registration successful! Please verify your email and complete payment.');
         navigate('/helper/payment', { 
           state: { 
             helperId: response.data.data.helperId,
