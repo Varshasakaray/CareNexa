@@ -33,7 +33,20 @@ app.use(cors({
     credentials:true
 }));
 
+app.use(cors({
+    origin: [
+      "http://localhost:5173",
+      "https://care-nexa-livid.vercel.app/",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
